@@ -14,6 +14,7 @@ from sklearn.model_selection import StratifiedKFold
 import ipdb
 from torch.utils.data import ConcatDataset
 
+
 def init_structural_encoding(gs, rw_dim=16, dg_dim=16):
     for g in gs:
         A = to_scipy_sparse_matrix(g.edge_index, num_nodes=g.num_nodes)
@@ -25,10 +26,10 @@ def init_structural_encoding(gs, rw_dim=16, dg_dim=16):
 
         RWSE = [torch.from_numpy(M.diagonal()).float()]
         M_power = M
-        for _ in range(rw_dim-1):
+        for _ in range(rw_dim - 1):
             M_power = M_power * M
             RWSE.append(torch.from_numpy(M_power.diagonal()).float())
-        RWSE = torch.stack(RWSE,dim=-1)
+        RWSE = torch.stack(RWSE, dim=-1)
 
         g_dg = (degree(g.edge_index[0], num_nodes=g.num_nodes)).numpy().clip(0, dg_dim - 1)
         DGSE = torch.zeros([g.num_nodes, dg_dim])
@@ -40,12 +41,12 @@ def init_structural_encoding(gs, rw_dim=16, dg_dim=16):
     return gs
 
 
-
 def x_svd(data, out_dim):
     assert data.shape[-1] >= out_dim
     U, S, _ = torch.linalg.svd(data)
-    newdata= torch.mm(U[:, :out_dim], torch.diag(S[:out_dim]))
+    newdata = torch.mm(U[:, :out_dim], torch.diag(S[:out_dim]))
     return newdata
+
 
 def unifeature(gs, unidim=8):
     # ipdb.set_trace()
@@ -59,6 +60,7 @@ def unifeature(gs, unidim=8):
         #     ipdb.set_trace()
         g['x'] = random_feature
     return gs
+
 
 def get_ad_split_TU(args, fold=10):
     path_now = "/data/chniu/phase6_24_10/GLADdata"
@@ -77,15 +79,15 @@ def get_ad_split_TU(args, fold=10):
     return splits
 
 
-#10 TU dataset
+# 10 TU dataset
 def get_ad_dataset_TU(args, target_dataset=None):
-    path_now =  "/data/chniu/phase6_24_10/GLADdata"
+    path_now = "/data/"
     path = osp.join(path_now, args.DS)
     if target_dataset is not None:
         dataset_name = target_dataset
     else:
         dataset_name = args.DS
-        
+
     if dataset_name in ['IMDB-BINARY', 'REDDIT-BINARY', 'COLLAB']:
         dataset = TUDataset(path, name=dataset_name, transform=(Constant(1, cat=False)))
     else:
@@ -100,7 +102,7 @@ def get_ad_dataset_TU(args, target_dataset=None):
         data.edge_attr = None
         data_list.append(data)
         label_list.append(data.y.item())
-    
+
     data_list = unifeature(data_list, args.unifeat)
     feat_dims = np.mean([_.x.shape[1] for _ in data_list])
     train_data_list = []
@@ -115,9 +117,9 @@ def get_ad_dataset_TU(args, target_dataset=None):
     # ipdb.set_trace()
     if target_dataset is None:
         dataloader = DataLoader(train_data_list, batch_size=args.batch_size, shuffle=True)
-        meta = {'num_train':len(train_data_list), 'min_nodes_num':min_nodes_num,'num_edge_feat':0}
+        meta = {'num_train': len(train_data_list), 'min_nodes_num': min_nodes_num, 'num_edge_feat': 0}
     else:
         dataloader = DataLoader(data_list, batch_size=args.batch_size, shuffle=True)
-        meta = {'num_train':len(data_list), 'min_nodes_num':min_nodes_num,'num_edge_feat':0}
+        meta = {'num_train': len(data_list), 'min_nodes_num': min_nodes_num, 'num_edge_feat': 0}
 
     return dataset, dataloader, meta
