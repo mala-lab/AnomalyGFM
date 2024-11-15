@@ -124,7 +124,7 @@ class Detector(ABC):
         params = {}
         for key in sorted([p.name for p in parameters]):
             params[key] = getattr(self, key, None)
-        return '%s(%s)' % (class_name, pprint(params, offset=len(class_name)))
+        return '%s(%s)' % (class_name, print(params, offset=len(class_name)))
 
 
 class DeepDetector(Detector, ABC):

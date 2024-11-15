@@ -1,5 +1,3 @@
-
-
 import torch
 import torch.nn.functional as F
 from torch.nn import Linear, ReLU, ModuleList, Sequential, BatchNorm1d
@@ -9,7 +7,7 @@ from torch_geometric.utils import batched_negative_sampling, dropout_adj
 from torch_scatter import scatter
 import torch.nn as nn
 import torch.nn.init as init
-import ipdb
+# import ipdb
 
 def create_model(backbone, in_channels, hid_channels, num_unit, dropout=0.0, dropedge=0.0, batch_norm=False):
     if backbone == 'GCN':
@@ -442,7 +440,7 @@ class myGIN(torch.nn.Module):
             z = self.pooling(z, batch)
             z_cat.append(z)
         z_cat = torch.cat(z_cat, -1)
-        return z_cat
+        return z_cat, y_predict
 
     def reset_parameters(self):
         for norm in self.norms:
@@ -451,6 +449,7 @@ class myGIN(torch.nn.Module):
             conv.reset_parameters()
         for proj in self.projs:
             proj.reset_parameters()
+
 
 class myGIN_classifier(nn.Module):
     def __init__(self, dim_features, dim_targets, args):

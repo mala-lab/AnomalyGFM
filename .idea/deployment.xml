@@ -19,7 +19,7 @@
       <paths name="qiaohezhe@10.0.104.138:22 password (2)">
         <serverdata>
           <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/home/qiaohezhe/code/GADPrompt" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

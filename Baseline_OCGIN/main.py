@@ -30,19 +30,22 @@ def main(args):
     if args.exp_type == 'ad':
         print("-------")
         dataset, dataloader, meta = get_ad_dataset_TU(args)
-    
+
+
     args.min_nodes_num = meta['min_nodes_num']
     args.n_train =  meta['num_train']
     args.n_edge_feat = meta['num_edge_feat']
 
     model = init_model(args)
-    
+
     if args.model == "OCGIN":
         print(args.model)
+        # train on dataset
         model.fit(dataset=dataset, args=args, label=None, dataloader=dataloader)
 
 
-        # test on other datasets 
+
+        # zero test on other datasets
         test_datasets = ['DD', 'BZR', 'AIDS', 'COX2', 'NCI1', 'DHFR']
         for target_datset in test_datasets:
             # ipdb.set_trace()
@@ -60,7 +63,7 @@ if __name__ == '__main__':
     parser.add_argument("-gpu", type=int, default=0, help="GPU Index. Default: -1, using CPU.")
     parser.add_argument("-data_root", default='data', type=str)
     parser.add_argument('-exp_type', type=str, default='ad', choices=['oodd', 'ad','ood'])
-    parser.add_argument('-DS', help='Dataset', default='AIDS') 
+    parser.add_argument('-DS', help='Dataset', default='AIDS')
     parser.add_argument('-DS_ood', help='Dataset', default='ogbg-molsider')
     parser.add_argument('-DS_pair', default=None)
     parser.add_argument('-rw_dim', type=int, default=16)
@@ -81,7 +84,7 @@ if __name__ == '__main__':
     parser.add_argument('-dropout', type=float, default=0.3, help='Dropout rate.')
     parser.add_argument('-aggregation', default='add')
     parser.add_argument('-bias', default=False)
-   
+
 
     args = parser.parse_args()
 
