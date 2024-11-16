@@ -38,11 +38,10 @@ def main(args):
 
     model = init_model(args)
 
-    if args.model == "OCGIN":
+    if args.model == "bce":
         print(args.model)
         # train on dataset
         model.fit(dataset=dataset, args=args, label=None, dataloader=dataloader)
-
 
 
         # zero test on other datasets
@@ -59,12 +58,13 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-model", type=str, default="OCGIN", help="supported model: [GLocalKD, GLADC, SIGNET, GOOD-D, GraphDE, CVTGAD].")
+    parser.add_argument("-model", type=str, default="bce", help="supported model: [GLocalKD, GLADC, SIGNET, GOOD-D, GraphDE, CVTGAD].")
     parser.add_argument("-gpu", type=int, default=0, help="GPU Index. Default: -1, using CPU.")
     parser.add_argument("-data_root", default='data', type=str)
-    parser.add_argument('-exp_type', type=str, default='ad', choices=['oodd', 'ad','ood'])
+    parser.add_argument('-exp_type', type=str, default='ad', choices=['oodd', 'ad', 'ood'])
     parser.add_argument('-DS', help='Dataset', default='AIDS')
     parser.add_argument('-DS_ood', help='Dataset', default='ogbg-molsider')
+    parser.add_argument('--negsamp_ratio', type=int, default=1)
     parser.add_argument('-DS_pair', default=None)
     parser.add_argument('-rw_dim', type=int, default=16)
     parser.add_argument('-unifeat', type=int, default=8)

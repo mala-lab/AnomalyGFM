@@ -16,15 +16,11 @@ class BCE(nn.Module):
         self.num_layers = args.num_layer
         self.device = args.gpu
         self.myGIN = myGIN(dim_features, self.dim_targets, args)
-        self.center = torch.zeros(1, self.dim_targets * self.num_layers, requires_grad=False).to('cuda')
+
         self.b_xent = nn.BCEWithLogitsLoss(reduction='none', pos_weight=torch.tensor([args.negsamp_ratio]))
-        self.ord = 2
         self.reset_parameters()
 
-        self.fc_normal_prompt = nn.Linear(self.dim_targets, self.dim_targets, bias=False)
-        self.fc_abnormal_prompt = nn.Linear(self.dim_targets, self.dim_targets, bias=False)
-
-    def forward(self, data, ano_label):
+    def forward(self, data):
         data = data.to(self.device)
         z, y_predict = self.myGIN(data)  # modifiy GIN
 

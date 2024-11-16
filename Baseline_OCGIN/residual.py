@@ -24,22 +24,23 @@ class Residual(nn.Module):
         self.fc_normal_prompt = nn.Linear(self.dim_targets, self.dim_targets, bias=False)
         self.fc_abnormal_prompt = nn.Linear(self.dim_targets, self.dim_targets, bias=False)
 
-    def forward(self, data, ano_label):
+    def forward(self, data, ano_label, abnormal_prompt):
         data = data.to(self.device)
         z, y_predict = self.myGIN(data)  # modifiy GIN
         # mean z_mean
         z_mean = torch.mean(z)
-        # nor
+        # normal
         # z_normal_residual = z[ano_label==0] - z_mean
         # abnormal
         z_abnormal_residual = z[ano_label == 1] - z_mean
 
         # residual feature
+        abnormal_prompt = self.act(self.fc_abnormal_prompt(abnormal_prompt))
 
         # contrastive learning
         y_predict = self.fc1(z)
 
-        return z_abnormal_residual, y_predict
+        return z_abnormal_residual, y_predict, abnormal_prompt
 
     def init_center(self, train_loader):
         with torch.no_grad():
@@ -52,11 +53,13 @@ class Residual(nn.Module):
     def reset_parameters(self):
         self.net.reset_parameters()
 
-    def loss_func(self, z_c):
+    def loss_func(self, z_c, ano_labels_train):
         # loss_residual + BCE loss
 
         loss_bce_score = torch.mean(self.b_xent(z_c, ano_labels_train))
 
-        loss_alignment = torch.sqrt(torch.sum((normal_prompt - normal_proto) ** 2, dim=2))
+        loss_alignment = torch.sqrt(torch.sum((abnormal_prompt - abnormal_proto) ** 2, dim=2))
 
         # contrastive learning
+
+        return loss_alignment + loss_bce_score
