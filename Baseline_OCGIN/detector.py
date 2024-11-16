@@ -73,20 +73,20 @@ class OCGIN(torch.nn.Module):
                 all_loss += loss_epoch.sum()
             mean_loss = all_loss.item() / args.n_train
             print('[TRAIN] Epoch:{:03d} | Loss:{:.4f}'.format(epoch, mean_loss))
-            # if (epoch) % args.eval_freq == 0 and epoch > 0:
-            #     self.model.eval()
 
-            #     y_val = []
-            #     score_val = []
-            #     for data in dataloader:
-            #         data = data.to(self.device)
-            #         score_epoch = self.forward_model(data, dataloader, args,True)
-            #         score_val = score_val + score_epoch.detach().cpu().tolist()
-            #         y_true = data.y
-            #         y_val = y_val + y_true.detach().cpu().tolist()
+            if (epoch) % args.eval_freq == 0 and epoch > 0:
+                self.model.eval()
+                y_val = []
+                score_val = []
+                for data in dataloader:
+                    data = data.to(self.device)
+                    score_epoch = self.forward_model(data, dataloader, args, True)
+                    score_val = score_val + score_epoch.detach().cpu().tolist()
+                    y_true = data.y
+                    y_val = y_val + y_true.detach().cpu().tolist()
 
-            #     val_auc = ood_auc(y_val, score_val)
-            #     print('Epoch:{:03d} | val_auc:{:.4f}'.format(epoch, val_auc))
+                val_auc = ood_auc(y_val, score_val)
+                print('Epoch:{:03d} | val_auc:{:.4f}'.format(epoch, val_auc))
         return self
 
     def is_directory_empty(self, directory):
@@ -107,9 +107,9 @@ class OCGIN(torch.nn.Module):
             y_true_all = y_true_all + y_true.detach().cpu().tolist()
         return y_score_all, y_true_all
 
-    def forward_model(self, data, dataloader=None, args=None, eval=None):
+    def forward_model(self, data, ano_label_train):
         emb = self.model(data)
-        loss = self.model.loss_func(emb, eval)
+        loss = self.model.loss_func(emb, ano_label_train)
         return loss
 
     def predict(self,
@@ -190,7 +190,8 @@ class BCE(torch.nn.Module):
             for data in dataloader:
                 n_bw += 1
                 data = data.to(self.device)
-                loss_epoch = self.forward_model(data, dataloader, args, False)
+                ano_label_train = data.y
+                loss_epoch, y_predict = self.forward_model(data, ano_label_train)
                 loss_mean = loss_epoch.mean()
                 optimizer.zero_grad()
                 loss_mean.backward()
@@ -198,6 +199,7 @@ class BCE(torch.nn.Module):
                 all_loss += loss_epoch.sum()
             mean_loss = all_loss.item() / args.n_train
             print('[TRAIN] Epoch:{:03d} | Loss:{:.4f}'.format(epoch, mean_loss))
+
             # if (epoch) % args.eval_freq == 0 and epoch > 0:
             #     self.model.eval()
 
@@ -218,24 +220,24 @@ class BCE(torch.nn.Module):
         files_and_dirs = os.listdir(directory)
         return len(files_and_dirs) == 0
 
-    def decision_function(self, dataset, ano_label_train, dataloader=None, args=None):
+    def decision_function(self, dataset, dataloader=None, args=None):
         self.model.eval()
 
         y_score_all = []
         y_true_all = []
         for data in dataloader:
             data = data.to(self.device)
-            y_score = self.forward_model(data, dataloader, ano_label_train, True)
+            loss, y_score = self.forward_model(data, data.y)
             # outlier_score[node_idx[:batch_size]] = y_score
-            y_score_all = y_score_all + y_score.detach().cpu().tolist()
+            y_score_all += y_score.detach().cpu().tolist()
             y_true = data.y
-            y_true_all = y_true_all + y_true.detach().cpu().tolist()
+            y_true_all += y_true.detach().cpu().tolist()
         return y_score_all, y_true_all
 
-    def forward_model(self, data, ano_label_train, eval=None):
+    def forward_model(self, data, ano_label_train):
         y_predict = self.model(data)
-        loss = self.model.loss_func(y_predict, ano_label_train)
-        return loss
+        loss = self.model.loss_func(torch.squeeze(y_predict), ano_label_train)
+        return loss, y_predict
 
     def predict(self,
                 dataset=None,
@@ -254,7 +256,7 @@ class BCE(torch.nn.Module):
             score = self.decision_score_
 
         else:
-            score, y_all = self.decision_function(dataset, label, dataloader, args)
+            score, y_all = self.decision_function(dataset, dataloader, args)
             output = (score, y_all)
             return output
 

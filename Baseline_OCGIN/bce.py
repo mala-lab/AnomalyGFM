@@ -16,17 +16,15 @@ class BCE(nn.Module):
         self.num_layers = args.num_layer
         self.device = args.gpu
         self.myGIN = myGIN(dim_features, self.dim_targets, args)
-
         self.b_xent = nn.BCEWithLogitsLoss(reduction='none', pos_weight=torch.tensor([args.negsamp_ratio]))
-        self.reset_parameters()
+        self.fc1 =  nn.Linear(args.hidden_dim * self.num_layers, 1, bias=False)
+
 
     def forward(self, data):
         data = data.to(self.device)
-        z, y_predict = self.myGIN(data)  # modifiy GIN
-
+        z = self.myGIN(data)  # modifiy GIN
         y_predict = self.fc1(z)
-
-        return  y_predict
+        return y_predict
 
     def init_center(self, train_loader):
         with torch.no_grad():
@@ -36,10 +34,8 @@ class BCE(nn.Module):
                 self.center += torch.sum(z[0], 0, keepdim=True)
             self.center = self.center / len(train_loader.dataset)
 
-    def reset_parameters(self):
-        self.net.reset_parameters()
 
     def loss_func(self, y_predict, ano_label_train):
 
-        loss_bce_score = torch.mean(self.b_xent(y_predict, ano_label_train))
-        return  loss_bce_score
+        loss_bce_score = torch.mean(self.b_xent(y_predict, ano_label_train.float()))
+        return loss_bce_score

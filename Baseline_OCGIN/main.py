@@ -33,7 +33,7 @@ def main(args):
 
 
     args.min_nodes_num = meta['min_nodes_num']
-    args.n_train =  meta['num_train']
+    args.n_train = meta['num_train']
     args.n_edge_feat = meta['num_edge_feat']
 
     model = init_model(args)
@@ -42,7 +42,6 @@ def main(args):
         print(args.model)
         # train on dataset
         model.fit(dataset=dataset, args=args, label=None, dataloader=dataloader)
-
 
         # zero test on other datasets
         test_datasets = ['DD', 'BZR', 'AIDS', 'COX2', 'NCI1', 'DHFR']

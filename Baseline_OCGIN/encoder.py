@@ -440,7 +440,7 @@ class myGIN(torch.nn.Module):
             z = self.pooling(z, batch)
             z_cat.append(z)
         z_cat = torch.cat(z_cat, -1)
-        return z_cat, y_predict
+        return z_cat
 
     def reset_parameters(self):
         for norm in self.norms:

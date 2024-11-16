@@ -113,6 +113,7 @@ def get_ad_dataset_TU(args, target_dataset=None):
                 train_data_list.append(data)
         else:
             data.y = 1
+            train_data_list.append(data)
 
     # ipdb.set_trace()
     if target_dataset is None:
