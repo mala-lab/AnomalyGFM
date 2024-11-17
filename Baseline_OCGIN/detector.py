@@ -326,20 +326,20 @@ class residual(torch.nn.Module):
                 all_loss += loss_epoch.sum()
             mean_loss = all_loss.item() / args.n_train
             print('[TRAIN] Epoch:{:03d} | Loss:{:.4f}'.format(epoch, mean_loss))
-            # if (epoch) % args.eval_freq == 0 and epoch > 0:
-            #     self.model.eval()
+            if (epoch) % args.eval_freq == 0 and epoch > 0:
+                self.model.eval()
 
-            #     y_val = []
-            #     score_val = []
-            #     for data in dataloader:
-            #         data = data.to(self.device)
-            #         score_epoch = self.forward_model(data, dataloader, args,True)
-            #         score_val = score_val + score_epoch.detach().cpu().tolist()
-            #         y_true = data.y
-            #         y_val = y_val + y_true.detach().cpu().tolist()
+                y_val = []
+                score_val = []
+                for data in dataloader:
+                    data = data.to(self.device)
+                    score_epoch = self.forward_model(data, dataloader, args,True)
+                    score_val = score_val + score_epoch.detach().cpu().tolist()
+                    y_true = data.y
+                    y_val = y_val + y_true.detach().cpu().tolist()
 
-            #     val_auc = ood_auc(y_val, score_val)
-            #     print('Epoch:{:03d} | val_auc:{:.4f}'.format(epoch, val_auc))
+                val_auc = ood_auc(y_val, score_val)
+                print('Epoch:{:03d} | val_auc:{:.4f}'.format(epoch, val_auc))
         return self
 
     def is_directory_empty(self, directory):
@@ -360,10 +360,10 @@ class residual(torch.nn.Module):
             y_true_all = y_true_all + y_true.detach().cpu().tolist()
         return y_score_all, y_true_all
 
-    def forward_model(self, data, dataloader=None, args=None, eval=None):
-        emb = self.model(data)
-        loss = self.model.loss_func(emb, eval)
-        return loss
+    def forward_model(self, data, ano_label_train):
+        y_predict, abnormal_prompt, abnormal_proto = self.model(data)
+        loss = self.model.loss_func(torch.squeeze(y_predict), ano_label_train, abnormal_prompt, abnormal_proto)
+        return loss, y_predict
 
     def predict(self,
                 dataset=None,
