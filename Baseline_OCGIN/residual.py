@@ -11,7 +11,6 @@ import torch
 class Residual(nn.Module):
     def __init__(self, dim_features, args):
         super(Residual, self).__init__()
-
         self.dim_targets = args.hidden_dim
         self.num_layers = args.num_layer
         self.device = args.gpu
@@ -21,24 +20,25 @@ class Residual(nn.Module):
         self.fc1 =  nn.Linear(args.hidden_dim * self.num_layers, 1, bias=False)
 
         self.fc_normal_prompt = nn.Linear(self.dim_targets, self.dim_targets, bias=False)
-        self.fc_abnormal_prompt = nn.Linear(self.dim_targets, self.dim_targets, bias=False)
+        self.fc_abnormal_prompt = nn.Linear(self.dim_targets, self.dim_targets*self.num_layers, bias=False)
 
     def forward(self, data, ano_label, abnormal_prompt):
         data = data.to(self.device)
         z = self.myGIN(data)  # modifiy GIN
         # mean z_mean
-        z_mean = torch.mean(z)
+        z_mean = torch.mean(z, 0)
         # normal
         # z_normal_residual = z[ano_label==0] - z_mean
         # abnormal
-        abnormal_proto = z[ano_label == 1] - z_mean
+        all_residual = z - z_mean
+        abnormal_residual = z[ano_label == 1] - z_mean
 
         # residual feature
         abnormal_prompt = self.fc_abnormal_prompt(abnormal_prompt)
 
         y_predict = self.fc1(z)
 
-        return z, y_predict, abnormal_prompt, abnormal_proto
+        return z, y_predict, abnormal_prompt, abnormal_residual, all_residual
 
 
     def reset_parameters(self):
@@ -48,6 +48,6 @@ class Residual(nn.Module):
 
         loss_bce_score = torch.mean(self.b_xent(y_predict, ano_label_train.float()))
 
-        loss_alignment = torch.sqrt(torch.sum((abnormal_prompt - abnormal_proto) ** 2, dim=2))
+        loss_alignment = torch.sqrt(torch.sum((abnormal_prompt - abnormal_proto) ** 2))
 
         return loss_alignment + loss_bce_score
