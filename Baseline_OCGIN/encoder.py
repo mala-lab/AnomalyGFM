@@ -430,6 +430,7 @@ class myGIN(torch.nn.Module):
         # ipdb.set_trace()
         x, edge_index, batch = graph.x, graph.edge_index, graph.batch
         z_cat = []
+        z_residual_cat = []
 
         for layer in range(self.num_layers):
             x = self.convs[layer](x, edge_index)
@@ -441,6 +442,71 @@ class myGIN(torch.nn.Module):
             z_cat.append(z)
         z_cat = torch.cat(z_cat, -1)
         return z_cat
+
+    def reset_parameters(self):
+        for norm in self.norms:
+            norm.reset_parameters()
+        for conv in self.convs:
+            conv.reset_parameters()
+        for proj in self.projs:
+            proj.reset_parameters()
+
+
+class myGIN_residual(torch.nn.Module):
+
+    def __init__(self, dim_features, dim_targets, args):
+        super(myGIN_residual, self).__init__()
+
+        hidden_dim = args.hidden_dim
+        self.num_layers = args.num_layer
+        self.nns = []
+        self.convs = []
+        self.norms = []
+        self.projs = []
+        self.use_norm = 'gn'
+        bias = args.bias
+
+        if args.aggregation == 'add':
+            self.pooling = global_add_pool
+        elif args.aggregation == 'mean':
+            self.pooling = global_mean_pool
+
+        for layer in range(self.num_layers):
+            if layer == 0:
+                input_emb_dim = dim_features
+            else:
+                input_emb_dim = hidden_dim
+            self.nns.append(Sequential(Linear(input_emb_dim, hidden_dim, bias=bias), ReLU(), Linear(hidden_dim, hidden_dim, bias=bias)))
+            self.convs.append(GINConv(self.nns[-1], train_eps=bias))  # Eq. 4.2
+            if self.use_norm == 'gn':
+                self.norms.append(GraphNorm(hidden_dim, True))
+            self.projs.append(myMLP(hidden_dim, hidden_dim, dim_targets, bias))
+
+        self.nns = nn.ModuleList(self.nns)
+        self.convs = nn.ModuleList(self.convs)
+        self.norms = nn.ModuleList(self.norms)
+        self.projs = nn.ModuleList(self.projs)
+
+    def forward(self, graph):
+        # ipdb.set_trace()
+        x, edge_index, batch = graph.x, graph.edge_index, graph.batch
+        z_cat = []
+        z_residual_cat = []
+
+        for layer in range(self.num_layers):
+            x = self.convs[layer](x, edge_index)
+            if self.use_norm == 'gn':
+                x = self.norms[layer](x, graph)
+            x = F.relu(x)
+            z = self.projs[layer](x)
+            z_residual = z - torch.mean(z, 0)
+            z = self.pooling(z, batch)
+            z_residual = self.pooling(z_residual, batch)
+            z_cat.append(z)
+            z_residual_cat.append(z_residual)
+        z_cat = torch.cat(z_cat, -1)
+        z_residual_cat = torch.cat(z_residual_cat, -1)
+        return z_cat, z_residual_cat
 
     def reset_parameters(self):
         for norm in self.norms:

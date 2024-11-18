@@ -38,7 +38,7 @@ def main(args):
 
     model = init_model(args)
 
-    if args.model == "residual":
+    if args.model == "bce":
         print(args.model)
         # train on dataset
         model.fit(dataset=dataset, args=args, label=None, dataloader=dataloader)
@@ -57,7 +57,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-model", type=str, default="residual", help="supported model: [GLocalKD, GLADC, SIGNET, GOOD-D, GraphDE, CVTGAD].")
+    parser.add_argument("-model", type=str, default="bce", help="supported model: [GLocalKD, GLADC, SIGNET, GOOD-D, GraphDE, CVTGAD].")
     parser.add_argument("-gpu", type=int, default=0, help="GPU Index. Default: -1, using CPU.")
     parser.add_argument("-data_root", default='data', type=str)
     parser.add_argument('-exp_type', type=str, default='ad', choices=['oodd', 'ad', 'ood'])
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     parser.add_argument('-num_layer', type=int, default=5)
     parser.add_argument('-hidden_dim', type=int, default=16)
     parser.add_argument('-num_trial', type=int, default=5)
-    parser.add_argument('-num_epoch', type=int, default=20)
+    parser.add_argument('-num_epoch', type=int, default=100)
     parser.add_argument('-eval_freq', type=int, default=4)
     parser.add_argument('-is_adaptive', type=int, default=1)
     parser.add_argument('-num_cluster', type=int, default=2)
