@@ -38,7 +38,7 @@ def main(args):
 
     model = init_model(args)
 
-    if args.model == "bce":
+    if args.model == "residual":
         print(args.model)
         # train on dataset
         model.fit(dataset=dataset, args=args, label=None, dataloader=dataloader)
@@ -57,7 +57,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-model", type=str, default="bce", help="supported model: [GLocalKD, GLADC, SIGNET, GOOD-D, GraphDE, CVTGAD].")
+    parser.add_argument("-model", type=str, default="residual", help="supported model: [GLocalKD, GLADC, SIGNET, GOOD-D, GraphDE, CVTGAD].")
     parser.add_argument("-gpu", type=int, default=0, help="GPU Index. Default: -1, using CPU.")
     parser.add_argument("-data_root", default='data', type=str)
     parser.add_argument('-exp_type', type=str, default='ad', choices=['oodd', 'ad', 'ood'])

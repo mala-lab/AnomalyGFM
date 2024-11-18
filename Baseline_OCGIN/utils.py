@@ -25,7 +25,7 @@ def init_model(args):
                      args=args)
 
     if model_name == "residual":
-        return OCGIN(in_dim=args.unifeat,
+        return Residual(in_dim=args.unifeat,
                      hid_dim=args.hidden_dim,
                      num_layers=args.num_layer,
                      str_dim=args.dg_dim + args.rw_dim,

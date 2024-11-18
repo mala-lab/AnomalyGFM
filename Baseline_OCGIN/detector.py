@@ -6,7 +6,7 @@ import bce
 import numpy as np
 from metric import *
 import os
-
+import torch.nn.functional as F
 
 class OCGIN(torch.nn.Module):
     def __init__(self,
@@ -107,9 +107,9 @@ class OCGIN(torch.nn.Module):
             y_true_all = y_true_all + y_true.detach().cpu().tolist()
         return y_score_all, y_true_all
 
-    def forward_model(self, data, ano_label_train):
+    def forward_model(self, data, ano_label_train, abnormal_prompt, abnormal_proto):
         emb = self.model(data)
-        loss = self.model.loss_func(emb, ano_label_train)
+        loss = self.model.loss_func(emb, ano_label_train,  abnormal_prompt, abnormal_proto)
         return loss
 
     def predict(self,
@@ -261,7 +261,7 @@ class BCE(torch.nn.Module):
             return output
 
 
-class residual(torch.nn.Module):
+class Residual(torch.nn.Module):
     def __init__(self,
                  in_dim=None,
                  hid_dim=64,
@@ -285,7 +285,7 @@ class residual(torch.nn.Module):
                  compile_model=False,
                  args=None,
                  **kwargs):
-        super(residual, self).__init__()
+        super(Residual, self).__init__()
 
         self.in_dim = in_dim
         self.hid_dim = hid_dim
@@ -293,7 +293,7 @@ class residual(torch.nn.Module):
         self.warmup = warmup
         self.eps = eps
         self.args = args
-        self.abnormal_prompt = torch.randn(args.embedding_dim)
+        self.abnormal_prompt = torch.randn(hid_dim)
 
     def process_graph(self, data):
         pass
@@ -302,7 +302,6 @@ class residual(torch.nn.Module):
         return residual.Residual(dim_features=self.in_dim, args=self.args).to(self.device)
 
     def fit(self, dataset, args=None, label=None, dataloader=None):
-        print("this is ocgin")
         self.device = torch.device('cuda:' + str(args.gpu) if torch.cuda.is_available() else 'cpu')
         self.model = self.init_model()
         optimizer = torch.optim.Adam(self.model.parameters(), lr=args.lr)
@@ -318,7 +317,8 @@ class residual(torch.nn.Module):
             for data in dataloader:
                 n_bw += 1
                 data = data.to(self.device)
-                loss_epoch = self.forward_model(data, dataloader, args, False)
+                ano_label_train = data.y
+                loss_epoch, y_predict, abnormal_prompt, abnormal_proto = self.forward_model(data, ano_label_train)
                 loss_mean = loss_epoch.mean()
                 optimizer.zero_grad()
                 loss_mean.backward()
@@ -326,6 +326,7 @@ class residual(torch.nn.Module):
                 all_loss += loss_epoch.sum()
             mean_loss = all_loss.item() / args.n_train
             print('[TRAIN] Epoch:{:03d} | Loss:{:.4f}'.format(epoch, mean_loss))
+
             if (epoch) % args.eval_freq == 0 and epoch > 0:
                 self.model.eval()
 
@@ -333,7 +334,7 @@ class residual(torch.nn.Module):
                 score_val = []
                 for data in dataloader:
                     data = data.to(self.device)
-                    score_epoch = self.forward_model(data, dataloader, args,True)
+                    score_epoch, y_predict, abnormal_prompt, abnormal_proto = self.forward_model(data, dataloader, args,True)
                     score_val = score_val + score_epoch.detach().cpu().tolist()
                     y_true = data.y
                     y_val = y_val + y_true.detach().cpu().tolist()
@@ -348,22 +349,30 @@ class residual(torch.nn.Module):
 
     def decision_function(self, dataset, label=None, dataloader=None, args=None):
         self.model.eval()
-
+        # using the similarity measurement with abnormal prompt
         y_score_all = []
         y_true_all = []
         for data in dataloader:
             data = data.to(self.device)
-            y_score = self.forward_model(data, dataloader, args, True)
+            y_score,  y_predict, abnormal_prompt, abnormal_proto = self.forward_model(data, dataloader, args, True)
             # outlier_score[node_idx[:batch_size]] = y_score
-            y_score_all = y_score_all + y_score.detach().cpu().tolist()
+
+            abnormal_prompt_val = F.normalize(abnormal_prompt, p=2, dim=0)
+            emb_residual_val = F.normalize(torch.squeeze(emb_residual_val), p=2, dim=1)
+            score_abnormal = torch.mm(emb_residual_val, torch.unsqueeze(abnormal_prompt_val, 1))
+            y_score = torch.exp(score_abnormal)
+
+            y_score_all += y_score.detach().cpu().tolist()
             y_true = data.y
-            y_true_all = y_true_all + y_true.detach().cpu().tolist()
+            y_true_all += y_true.detach().cpu().tolist()
+
         return y_score_all, y_true_all
 
     def forward_model(self, data, ano_label_train):
-        y_predict, abnormal_prompt, abnormal_proto = self.model(data)
+        abnormal_prompt = torch.randn(self.hid_dim).cuda()
+        emb, y_predict, abnormal_prompt, abnormal_proto = self.model(data, ano_label_train, abnormal_prompt)
         loss = self.model.loss_func(torch.squeeze(y_predict), ano_label_train, abnormal_prompt, abnormal_proto)
-        return loss, y_predict
+        return loss, y_predict, abnormal_prompt, abnormal_proto
 
     def predict(self,
                 dataset=None,

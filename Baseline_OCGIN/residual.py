@@ -18,7 +18,6 @@ class Residual(nn.Module):
         self.myGIN = myGIN(dim_features, self.dim_targets, args)
         self.center = torch.zeros(1, self.dim_targets * self.num_layers, requires_grad=False).to('cuda')
         self.b_xent = nn.BCEWithLogitsLoss(reduction='none', pos_weight=torch.tensor([args.negsamp_ratio]))
-        self.reset_parameters()
         self.fc1 =  nn.Linear(args.hidden_dim * self.num_layers, 1, bias=False)
 
         self.fc_normal_prompt = nn.Linear(self.dim_targets, self.dim_targets, bias=False)
@@ -35,7 +34,7 @@ class Residual(nn.Module):
         abnormal_proto = z[ano_label == 1] - z_mean
 
         # residual feature
-        abnormal_prompt = self.act(self.fc_abnormal_prompt(abnormal_prompt))
+        abnormal_prompt = self.fc_abnormal_prompt(abnormal_prompt)
 
         y_predict = self.fc1(z)
 
