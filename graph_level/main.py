@@ -1,6 +1,7 @@
 import torch
 import argparse
 import sys, os
+
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(base_dir)
 from metric import *
@@ -22,6 +23,7 @@ def set_seed(seed=3407):
         torch.cuda.manual_seed_all(seed)
         torch.backends.cudnn.deterministic = True
 
+
 def main(args):
     device = torch.device('cuda:' + str(args.gpu) if torch.cuda.is_available() else 'cpu')
     auc, ap, rec = [], [], []
@@ -29,9 +31,9 @@ def main(args):
     set_seed(seed)
 
     dataset, dataloader, meta = get_ad_dataset_TU(args)
-    
+
     args.min_nodes_num = meta['min_nodes_num']
-    args.n_train =  meta['num_train']
+    args.n_train = meta['num_train']
     args.n_edge_feat = meta['num_edge_feat']
 
     model = GIN(args.unifeat, args).to(device)
@@ -43,21 +45,21 @@ def main(args):
         model.train()
         optimiser.zero_grad()
 
-        normal_prompt = torch.randn(args.hidden_dim*args.num_layer).to(device)
-        abnormal_prompt = torch.randn(args.hidden_dim*args.num_layer).to(device)
-        
+        normal_prompt = torch.randn(args.hidden_dim * args.num_layer).to(device)
+        abnormal_prompt = torch.randn(args.hidden_dim * args.num_layer).to(device)
+
         for data in dataloader:
             data = data.to(device)
             logits, emb_residual, normal_prompt, abnormal_prompt = model(data, normal_prompt, abnormal_prompt)
             ipdb.set_trace()
             loss_bce = torch.mean(b_xent(logits, torch.unsqueeze(data.y.float(), 1)))
-            normal_proto = emb_residual[data.y==0]
-            abnormal_proto = emb_residual[data.y==1]
+            normal_proto = emb_residual[data.y == 0]
+            abnormal_proto = emb_residual[data.y == 1]
 
             dif_normal = torch.sqrt(torch.sum((normal_prompt - normal_proto) ** 2, dim=1))
             dif_abnormal = torch.sqrt(torch.sum((abnormal_prompt - abnormal_proto) ** 2, dim=1))
             loss_alignment = torch.mean(dif_abnormal) + torch.mean(dif_normal)
-            
+
             abnormal_prompt = F.normalize(abnormal_prompt, p=2, dim=0)
             normal_prompt = F.normalize(normal_prompt, p=2, dim=0)
             emb_residual = F.normalize(emb_residual, p=2, dim=1)
@@ -81,17 +83,20 @@ def main(args):
             for target_datset in test_datasets:
 
                 target_dataset, target_dataloader, meta = get_ad_dataset_TU(args, target_datset)
-                normal_prompt = torch.randn(args.embedding_dim*args.num_layer)
-                abnormal_prompt = torch.randn(args.embedding_dim*args.num_layer)
+                normal_prompt = torch.randn(args.embedding_dim * args.num_layer)
+                abnormal_prompt = torch.randn(args.embedding_dim * args.num_layer)
                 ano_labels_test = []
 
                 for data in target_dataloader:
-                    logits_test, emb_residual_test, normal_prompt_test, abnormal_prompt_test = model(target_dataloader, normal_prompt, abnormal_prompt)
+                    logits_test, emb_residual_test, normal_prompt_test, abnormal_prompt_test = model(target_dataloader,
+                                                                                                     normal_prompt,
+                                                                                                     abnormal_prompt)
                     ano_labels_test.append(data.y)
 
                 logits_test = np.squeeze(logits_test.cpu().detach().numpy())
                 auc = roc_auc_score(ano_labels_test, logits_test)
-                ap = average_precision_score(ano_labels_test, logits_test, average='macro', pos_label=1, sample_weight=None)
+                ap = average_precision_score(ano_labels_test, logits_test, average='macro', pos_label=1,
+                                             sample_weight=None)
                 print(f"{args.DS}-->{target_datset} Testing AUROC:{auc:.4f}, Testing AUPRC:{ap:.4f}")
 
                 abnormal_prompt_test = F.normalize(abnormal_prompt_test, p=2, dim=0)
@@ -104,16 +109,18 @@ def main(args):
                 ano_score = torch.exp(score_abnormal)
                 ano_score = ano_score.detach().numpy()
                 auc_measure = roc_auc_score(ano_labels_test, ano_score)
-                AP_measure = average_precision_score(ano_labels_test, ano_score, average='macro', pos_label=1,sample_weight=None)
-                print(f"{args.DS}-->{target_datset} Testing AUC_measure:{auc_measure:.4f}, Testing AUC_measure:{AP_measure:.4f}")
+                AP_measure = average_precision_score(ano_labels_test, ano_score, average='macro', pos_label=1,
+                                                     sample_weight=None)
+                print(
+                    f"{args.DS}-->{target_datset} Testing AUC_measure:{auc_measure:.4f}, Testing AUC_measure:{AP_measure:.4f}")
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-gpu", type=int, default=0, help="GPU Index. Default: -1, using CPU.")
     parser.add_argument("-data_root", default='data', type=str)
-    parser.add_argument('-exp_type', type=str, default='ad', choices=['oodd', 'ad','ood'])
-    parser.add_argument('-DS', help='Dataset', default='AIDS') 
+    parser.add_argument('-exp_type', type=str, default='ad', choices=['oodd', 'ad', 'ood'])
+    parser.add_argument('-DS', help='Dataset', default='AIDS')
     parser.add_argument('-DS_ood', help='Dataset', default='ogbg-molsider')
     parser.add_argument('-DS_pair', default=None)
     parser.add_argument('-rw_dim', type=int, default=16)

@@ -25,13 +25,14 @@ class Residual(nn.Module):
     def forward(self, data, ano_label, abnormal_prompt):
         data = data.to(self.device)
         z = self.myGIN(data)  # modifiy GIN
-        # mean z_mean
-        z_mean = torch.mean(z, 0)
-        # normal
-        # z_normal_residual = z[ano_label==0] - z_mean
-        # abnormal
-        all_residual = z - z_mean
-        abnormal_residual = z[ano_label == 1] - z_mean
+        # mean z_mean  remove centre
+        # z_mean = torch.mean(z, 0)
+        matrix = torch.ones((z.shape[0], z.shape[0]))
+        matrix = matrix - torch.eye(z.shape[0])
+        row_sums = matrix.sum(dim=1, keepdim=True)
+        normalized_matrix = matrix / row_sums
+        all_residual = z - torch.matmul(normalized_matrix.cuda(), z)
+        abnormal_residual = all_residual[ano_label == 1]
 
         # residual feature
         abnormal_prompt = self.fc_abnormal_prompt(abnormal_prompt)
@@ -50,4 +51,4 @@ class Residual(nn.Module):
 
         loss_alignment = torch.sqrt(torch.sum((abnormal_prompt - abnormal_proto) ** 2))
 
-        return loss_alignment + loss_bce_score
+        return  loss_bce_score, loss_alignment
