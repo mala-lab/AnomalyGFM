@@ -26,7 +26,7 @@ def dense_to_sparse(dense_matrix):
     return sparse_matrix
 
 
-def build_graph_from_embeddings(embeddings, threshold, metric='euclidean'):
+def build_graph_from_embeddings(embeddings, threshold):
     # extract the mat info
     print()
     norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
@@ -43,8 +43,8 @@ def build_graph_from_embeddings(embeddings, threshold, metric='euclidean'):
 
 if __name__ == "__main__":
     """Load .mat dataset."""
-    dataset = ''
-    data_train = sio.loadmat("data/{}.mat".format(dataset))
+    dataset = 'MUTAG'
+    data_train = sio.loadmat("data/graph/{}.mat".format(dataset))
 
     label_train = data_train['Label']
     embeddings = data_train['emb']
@@ -52,11 +52,11 @@ if __name__ == "__main__":
     threshold = 0.5  # 距离阈值
 
     # 构建图
-    adjacency_matrix = build_graph_from_embeddings(embeddings, threshold, metric='euclidean')
+    adjacency_matrix = build_graph_from_embeddings(embeddings, threshold)
 
     # Pack & save them into .mat
     print('Saving mat file...')
     attribute = dense_to_sparse(embeddings)
     adj = dense_to_sparse(adjacency_matrix)
 
-    sio.savemat('graph_con_dataset/{}.mat'.format(dataset), {'Network': adj, 'Label': label_train, 'Attributes': attribute})
+    sio.savemat('data/graph_str/{}.mat'.format(dataset), {'Network': adj, 'Label': label_train, 'Attributes': attribute})
