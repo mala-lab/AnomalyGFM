@@ -73,8 +73,8 @@ def dense_to_one_hot(labels_dense, num_classes):
 def load_mat(dataset_train, dataset_test, train_rate=0.3, val_rate=0.1):
     # Load training and test dataset
     """Load .mat dataset."""
-    data_train = sio.loadmat("data/{}.mat".format(dataset_train))
-    data_test = sio.loadmat("data/{}.mat".format(dataset_test))
+    data_train = sio.loadmat("data/data/{}.mat".format(dataset_train))
+    data_test = sio.loadmat("data/data/{}.mat".format(dataset_test))
 
     label_train = data_train['Label'] if ('Label' in data_train) else data_train['gnd']
     attr_train = data_train['Attributes'] if ('Attributes' in data_train) else data_train['X']

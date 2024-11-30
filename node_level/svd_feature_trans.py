@@ -22,8 +22,8 @@ def x_svd(data, out_dim):
     return newdata
 
 
-dataset_str = "Facebook"
-data = loadmat('data/{}.mat'.format(dataset_str))
+dataset_str = "MUTAG"
+data = loadmat('data/graph_str/{}.mat'.format(dataset_str))
 
 label = data['Label'] if ('Label' in data) else data['gnd']
 attr = data['Attributes'] if ('Attributes' in data) else data['X']
@@ -45,6 +45,6 @@ import numpy as np
 newX = x_svd(feat, 8)
 #
 feat = csc_matrix(feat)
-sio.savemat('data/{}_svd.mat'.format(dataset_str), \
+sio.savemat('data/data/{}_svd.mat'.format(dataset_str), \
             {'Network': adj, 'Label': label, 'Attributes': newX})
 print('Done. The file is save as: dataset/{}_svd.mat \n'.format(dataset_str))

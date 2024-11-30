@@ -24,7 +24,7 @@ parser = argparse.ArgumentParser(description='')
 parser.add_argument('--dataset_train', type=str,
                     default='Facebook_svd')  # Flickr_random  amazon  questions_random
 parser.add_argument('--dataset_test', type=str,
-                    default='reddit_svd')  # BlogCatalog_random  yelp  weibo_random reddit_random  tolokers_random tf_finace_random, elliptic_random
+                    default='MUTAG_svd')  # BlogCatalog_random  yelp  weibo_random reddit_random  tolokers_random tf_finace_random, elliptic_random
 parser.add_argument('--lr', type=float)
 parser.add_argument('--weight_decay', type=float, default=0.0)
 parser.add_argument('--seed', type=int, default=0)
@@ -321,7 +321,7 @@ with tqdm(total=args.num_epoch) as pbar:
                 ('label_train', ano_labels_train.detach().numpy()),
                 ('label_test', ano_labels_test.detach().numpy()),
             ])
-            scio.savemat('tsne/{}_{}.mat'.format(args.dataset_test, epoch), data_dict)
+            # scio.savemat('tsne/{}_{}.mat'.format(args.dataset_test, epoch), data_dict)
 
             ano_score = torch.exp(score_abnormal)
             ano_score = ano_score.detach().numpy()
