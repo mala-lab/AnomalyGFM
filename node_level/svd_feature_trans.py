@@ -22,7 +22,7 @@ def x_svd(data, out_dim):
     return newdata
 
 
-dataset_str = "MUTAG"
+dataset_str = "PROTEINS"
 data = loadmat('data/graph_str/{}.mat'.format(dataset_str))
 
 label = data['Label'] if ('Label' in data) else data['gnd']

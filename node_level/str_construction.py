@@ -43,7 +43,7 @@ def build_graph_from_embeddings(embeddings, threshold):
 
 if __name__ == "__main__":
     """Load .mat dataset."""
-    dataset = 'MUTAG'
+    dataset = 'PROTEINS'
     data_train = sio.loadmat("data/graph_emb/{}.mat".format(dataset))
 
     label_train = data_train['Label']

@@ -24,7 +24,7 @@ parser = argparse.ArgumentParser(description='')
 parser.add_argument('--dataset_train', type=str,
                     default='Facebook_svd')  # Flickr_random  amazon  questions_random
 parser.add_argument('--dataset_test', type=str,
-                    default='MUTAG_svd')  # BlogCatalog_random  yelp  weibo_random reddit_random  tolokers_random tf_finace_random, elliptic_random
+                    default='PROTEINS_svd')  # BlogCatalog_random  yelp  weibo_random reddit_random  tolokers_random tf_finace_random, elliptic_random
 parser.add_argument('--lr', type=float)
 parser.add_argument('--weight_decay', type=float, default=0.0)
 parser.add_argument('--seed', type=int, default=0)
