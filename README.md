@@ -23,7 +23,7 @@ better the state-of-the-art unsupervised, supervised, and generalist GAD methods
 
 
 
-The datasets after feature alignment can be obtained from   [google drive link](https://drive.google.com/drive/folders/1SSWgFRdth3U44_IMRnW775B1l-bjQATW?usp=sharing). 
+The GAD datasets after feature alignment can be obtained from   [google drive link](https://drive.google.com/drive/folders/1SSWgFRdth3U44_IMRnW775B1l-bjQATW?usp=sharing). 
 
 The code for AnomalyGFM and the adaptation to the baseline will be uploaded soon.
 
