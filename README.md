@@ -1,5 +1,5 @@
 <div align="center">
-  <h2><b> Anomalygfm: Graph Foundation Model for Zero/Few-shot Anomaly Detection </b></h2>
+  <h2><b> AnomalyGFM: Graph Foundation Model for Zero/Few-shot Anomaly Detection </b></h2>
 </div>
 
 <div align="center">
