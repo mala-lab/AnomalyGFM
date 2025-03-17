@@ -1,5 +1,5 @@
 <div align="center">
-  <h2><b> AnomalyGFM: Graph Foundation Model for Zero/Few-shot Anomaly Detection [**📝 arxiv**](https://arxiv.org/abs/2502.09254)</b></h2>
+  <h2><b> AnomalyGFM: Graph Foundation Model for Zero/Few-shot Anomaly Detection [**📝 arxiv**](https://arxiv.org/abs/2502.12904) </b></h2>
 </div>
 
 <div align="center">
@@ -10,6 +10,9 @@
 ![](https://img.shields.io/badge/PRs-Welcome-green)
 
 </div>
+
+[**📜 Datasets**](https://drive.google.com/drive/folders/1SSWgFRdth3U44_IMRnW775B1l-bjQATW?usp=sharing) [**📝 arxiv**](https://arxiv.org/abs/2502.12904)
+
 
 > 1️⃣ AnomalyGFM is the **first** GAD-oriented GFM with strong zero-shot and few-shot generalization abilities. 
 
