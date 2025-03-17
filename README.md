@@ -8,10 +8,10 @@
 ![](https://img.shields.io/github/stars/mala-lab/AnomalyGFM?color=yellow)
 ![](https://img.shields.io/github/forks/mala-lab/AnomalyGFM?color=lightblue)
 ![](https://img.shields.io/badge/PRs-Welcome-green)
+[**📜 Datasets**](https://drive.google.com/drive/folders/1SSWgFRdth3U44_IMRnW775B1l-bjQATW?usp=sharing) [**📝 arxiv**](https://arxiv.org/abs/2502.12904)
 
 </div>
 
-[**📜 Datasets**](https://drive.google.com/drive/folders/1SSWgFRdth3U44_IMRnW775B1l-bjQATW?usp=sharing) [**📝 arxiv**](https://arxiv.org/abs/2502.12904)
 
 
 > 1️⃣ AnomalyGFM is the **first** GAD-oriented GFM with strong zero-shot and few-shot generalization abilities. 
