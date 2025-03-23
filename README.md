@@ -29,12 +29,15 @@ The code for AnomalyGFM and the adaptation to the baseline will be uploaded soon
 
 
 
+
 ## Citation
 If you find this repo useful, please cite our paper.
 
+```bibtex
 @article{qiao2025anomalygfm,
   title={AnomalyGFM: Graph Foundation Model for Zero/Few-shot Anomaly Detection},
   author={Qiao, Hezhe and Niu, Chaoxi and Chen, Ling and Pang, Guansong},
   journal={arXiv preprint arXiv:2502.09254},
   year={2025}
 }
+```
