@@ -7,6 +7,7 @@
 ![](https://img.shields.io/github/last-commit/mala-lab/AnomalyGFM?color=green)
 ![](https://img.shields.io/github/stars/mala-lab/AnomalyGFM?color=yellow)
 ![](https://img.shields.io/github/forks/mala-lab/AnomalyGFM?color=lightblue)
+[![Visits Badge](https://badges.pufler.dev/visits/mala-lab/AnomalyGFM)](https://badges.pufler.dev/visits/mala-lab/AnomalyGFM)
 ![](https://img.shields.io/badge/PRs-Welcome-green)
 [**📜 Datasets**](https://drive.google.com/drive/folders/1SSWgFRdth3U44_IMRnW775B1l-bjQATW?usp=sharing) [**📝 arxiv**](https://arxiv.org/abs/2502.12904)
 
