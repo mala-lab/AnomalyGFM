@@ -31,8 +31,7 @@ The GAD datasets after feature alignment can be obtained from   [google drive li
 
 The code for  both AnomalyGFM and the adaptation to the baseline methods will be uploaded in this week.
 
-
-
+Still under maintenance, thank you for your patience ！
 
 ## Citation
 If you find this repo useful, please cite our paper.
