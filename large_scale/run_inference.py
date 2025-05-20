@@ -11,6 +11,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--seed', type=int, default=0)
+parser.add_argument('--beta', type=float, default=4)
 args = parser.parse_args()
 
 dgl.random.seed(args.seed)
@@ -21,10 +22,11 @@ torch.cuda.manual_seed_all(args.seed)
 random.seed(args.seed)
 
 
+
 subgraph_size = 7
 embedding_dim = 300
 # load the dataset
-dataset = 'tsocial'
+dataset = 'tfinance'   # tsocial
 sample_feature = np.load('/data/{}_feature_{}_1.npy'.format(dataset, subgraph_size+1))
 sample_labels = np.load('/data/{}_label_{}_1.npy'.format(dataset, subgraph_size+1))
 
@@ -75,7 +77,7 @@ for i in range(nodes_num):
     score_abnormal = F.cosine_similarity(residual_test.unsqueeze(0), abnormal_prompt_test.unsqueeze(0))
     score_normal =  F.cosine_similarity(residual_test.unsqueeze(0), normal_prompt_test.unsqueeze(0))
 
-    score = torch.exp(score_abnormal) + 4*torch.exp(-score_normal)
+    score = torch.exp(score_abnormal) + args.beta*torch.exp(-score_normal)
     # # #
     # score_abnormal = -F.cosine_similarity(residual_test.unsqueeze(0), normal_prompt_test.unsqueeze(0))
 
