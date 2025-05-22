@@ -52,13 +52,13 @@ python run_abnormal.py
 
 Run this command:
 ```
-python run_fine_tuning_normal.py 
+python run_finetune_normal.py 
 ```
 for few-shot labeled normal nodes fine-tuning.
 
 Run this command:
 ```
-python run_fine_tuning_abnormal.py 
+python run_finetune_abnormal.py 
 ```
 for few-shot labeled abnormal nodes fine-tuning.
 
