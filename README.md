@@ -33,33 +33,41 @@ The code for  both AnomalyGFM and the adaptation to the baseline methods will be
 
 Still under maintenance, thank you for your patience ！
 
+## Requirements
+
+To install requirements:
+
+```setup
+pip install -r requirements.txt
+```
+
 ## Training and Zero-shot Inference  
 
 To run the model(s), run this command:
-
+```
 python run_abnormal.py 
-
+```
 
 ## Training and Few-shot Inference  
 
 Run this command:
-
+```
 python run_fine_tuning_normal.py 
-
+```
 for few-shot labeled normal nodes fine-tuning.
 
 Run this command:
-
+```
 python run_fine_tuning_abnormal.py 
-
+```
 for few-shot labeled abnormal nodes fine-tuning.
 
 ## Large-scale Graph Generalization 
 
 Run this command:
-
+```
 python run_inference.py 
-
+```
 
 ## Citation
 If you find this repo useful, please cite our paper.
