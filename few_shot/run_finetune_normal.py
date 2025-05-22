@@ -47,8 +47,13 @@ args = parser.parse_args()
 # args.lr = 1e-5
 # args.num_epoch = 6
 args.lr = 1e-4
-args.num_epoch = 15
+args.num_epoch = 15   # large datasets  including elliptic and tfinance    
 
+
+if args.dataset_test in ['amazon_svd',  'Amazon_upu_svd', 'Disney_svd']:  # small datasets
+    args.num_epoch = 5
+if args.dataset_test in ['tolokers_svd',  'yelp_svd']:  # middle datasets
+    args.num_epoch = 10
 
 if args.dataset_test in ['elliptic_svd',  'tf_finace_svd']:
     args.beta = 4.0
