@@ -54,7 +54,7 @@ Run this command:
 ```
 python run_finetune_normal.py 
 ```
-for few-shot labeled normal nodes fine-tuning.
+For few-shot labeled normal nodes fine-tuning.
 
 Run this command:
 ```
