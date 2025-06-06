@@ -86,7 +86,7 @@ all_idx_test = list(range(ano_labels_test.shape[0]))
 all_idx_test_normal = list(np.where(ano_labels_test != 1)[0])
 random.shuffle(all_idx_test)
 random.shuffle(all_idx_test_normal)
-# few-shot id for training
+# few-shot id for training  [#top n]
 few_shot_train_id = all_idx_test_normal[:args.num_few_train_shot]
 few_shot_id = few_shot_train_id[:args.num_few_shot]
 # few-shot id for testing
