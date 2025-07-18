@@ -12,7 +12,7 @@
 </div>
 
 
-## Video
+## Promotional Video
 
 📢 We are excited to share that our paper presentation video is now available on YouTube!
 
@@ -22,7 +22,7 @@
 
 
 
-## Contributions
+## Main Contributions
 
 
 > 1️⃣ AnomalyGFM is the **first** GAD-oriented GFM with strong zero-shot and few-shot generalization abilities. 
