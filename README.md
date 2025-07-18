@@ -10,9 +10,14 @@
 ![](https://img.shields.io/badge/PRs-Welcome-green)
 [**📜 Datasets**](https://drive.google.com/drive/folders/1SSWgFRdth3U44_IMRnW775B1l-bjQATW?usp=sharing) [**📝 arxiv**](https://arxiv.org/abs/2502.09254)
 
+
+
+📢 We are excited to share that our paper presentation video is now available on YouTube!
+🎬 Watch it here: [[YouTube Link](https://youtu.be/OrY9epUwh0M?si=izAi9xjQuNLQmaMX)]
+📌 Your feedback and support are greatly appreciated!
+
+
 </div>
-
-
 
 > 1️⃣ AnomalyGFM is the **first** GAD-oriented GFM with strong zero-shot and few-shot generalization abilities. 
 
