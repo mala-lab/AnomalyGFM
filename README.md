@@ -80,10 +80,11 @@ python run_inference.py
 If you find this repo useful, please cite our paper.
 
 ```bibtex
-@article{qiao2025anomalygfm,
-  title={AnomalyGFM: Graph Foundation Model for Zero/Few-shot Anomaly Detection},
+@inproceedings{qiao2025anomalygfm,
+  title={AnomalyGFM: Graph foundation model for zero/few-shot anomaly detection},
   author={Qiao, Hezhe and Niu, Chaoxi and Chen, Ling and Pang, Guansong},
-  journal={arXiv preprint arXiv:2502.09254},
+  booktitle={Proceedings of the 31st ACM SIGKDD Conference on Knowledge Discovery and Data Mining V. 2},
+  pages={2326--2337},
   year={2025}
 }
 ```
