@@ -1,8 +1,8 @@
 <div align="center">
-  <h2><b> AnomalyGFM: Graph Foundation Model for Zero/Few-shot Anomaly Detection </b></h2>
-</div>
 
-<div align="center">
+<img src="logo.png" width="560">
+
+## AnomalyGFM: Graph Foundation Model for Zero/Few-shot Anomaly Detection 
 
 ![](https://img.shields.io/github/last-commit/mala-lab/AnomalyGFM?color=green)
 ![](https://img.shields.io/github/stars/mala-lab/AnomalyGFM?color=yellow)
