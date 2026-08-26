@@ -169,42 +169,42 @@ for _ in range(1):
         model_list.append(model)
 
     start_time = time.time()
-    for epoch in range(args.num_epoch):
-        for dataset in range(len(traindatasets)):
-            raw_adj = raw_adj_train[dataset]
-            features = feature_train[dataset]
-            raw_features = raw_feature_train[dataset]
+    for dataset in range(len(traindatasets)):
+    raw_adj = raw_adj_train[dataset]
+    features = feature_train[dataset]
+    raw_features = raw_feature_train[dataset]
 
-            score_list = []
-            new_adj_list = []
-            for n_t in range(args.N_tree):
-                new_adj_list.append(raw_adj)
-            all_cut_adj = torch.cat(new_adj_list)
-            origin_degree = torch.sum(torch.squeeze(raw_adj), 0)
-            print('<<<<<<Start to calculate distance<<<<<')
-            dis_array = dis_array_train[dataset]
+    score_list = []
+    new_adj_list = []
+    for n_t in range(args.N_tree):
+        new_adj_list.append(raw_adj)
+    all_cut_adj = torch.cat(new_adj_list)
+    origin_degree = torch.sum(torch.squeeze(raw_adj), 0)
+    print('<<<<<<Start to calculate distance<<<<<')
+    dis_array = dis_array_train[dataset]
 
-            index = 0
-            message_mean_list = []
-            for n_cut in range(args.cutting):
-                for n_t in range(args.N_tree):
-                    cut_adj = graph_nsgt(dis_array, all_cut_adj[n_t, :, :])
-                    cut_adj = cut_adj.unsqueeze(0)
-                    optimiser_list[index].zero_grad()
-                    model_list[index].train()
-                    print("<<<< cutting num .{}<<<<<<".format(n_cut))
-                    adj_norm = normalize_adj_tensor(cut_adj)
-    
-                    node_emb, feat1, feat2 = model_list[index].forward(features, adj_norm)
-                    loss, message_sum1 = max_message(node_emb[0, :, :], raw_adj[0, :, :])
+    index = 0
+    message_mean_list = []
+    for n_cut in range(args.cutting):
+        for n_t in range(args.N_tree):
+            cut_adj = graph_nsgt(dis_array, all_cut_adj[n_t, :, :])
+            cut_adj = cut_adj.unsqueeze(0)
+            optimiser_list[index].zero_grad()
+            model_list[index].train()
+            print("<<<< cutting num .{}<<<<<<".format(n_cut))
+            adj_norm = normalize_adj_tensor(cut_adj)
+            for epoch in range(args.num_epoch):
+                print("epoch:", epoch)
+                node_emb, feat1, feat2 = model_list[index].forward(features, adj_norm)
+                loss, message_sum1 = max_message(node_emb[0, :, :], raw_adj[0, :, :])
+                reg_loss = reg_edge(feat1[0, :, :], raw_adj[0, :, :])
+                loss = loss + args.lamda * reg_loss
+                loss.backward()
+                optimiser_list[index].step()
 
-                    reg_loss = reg_edge(feat1[0, :, :], raw_adj[0, :, :])
-                    loss = loss + args.lamda * reg_loss
-                    loss.backward()
-                    optimiser_list[index].step()
+            all_cut_adj[n_t, :, :] = torch.squeeze(cut_adj)
+            index += 1
 
-                    all_cut_adj[n_t, :, :] = torch.squeeze(cut_adj)
-                    index += 1
     end_time = time.time()  # End the timer
     elapsed_time = end_time - start_time
     print(f"Training Execution time: {elapsed_time} seconds")
@@ -215,6 +215,7 @@ for _ in range(1):
     # target_datasets = ['tf_finace']
     # target_datasets = ['tf_finace', 'elliptic']
     target_datasets = ['book', 'Disney']
+    # target_datasets =["tf_finace_svd","elliptic_svd","reddit_svd","tolokers_svd","yelp_svd","weibo_svd", "Disney_svd", "book_svd"]
     start_time = time.time()
     for dataset in target_datasets:
         adj, raw_adj, features, raw_features, ano_label = loaddata(dataset, args, device)
