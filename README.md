@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="logo.png" width="260">
+<img src="logo.png" width="200">
 
 ## AnomalyGFM: Graph Foundation Model for Zero/Few-shot Anomaly Detection 
 
